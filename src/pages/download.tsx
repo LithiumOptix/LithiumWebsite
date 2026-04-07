@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
-import logoImg from "@assets/logo_1775538520444.png";
 import { Bell, CheckCircle, Monitor, Cpu, Wifi, HardDrive, Check } from "lucide-react";
 
 const sysReqs = [
@@ -61,7 +60,8 @@ export default function Download() {
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="w-20 h-20 flex items-center justify-center mb-8"
             >
-              <img src={logoImg} alt="Lithium Logo" className="w-20 h-20 object-contain" />
+              {/* FIXED: Using direct path from public folder */}
+              <img src="/logo_1775538520444.png" alt="Lithium Logo" className="w-20 h-20 object-contain" />
             </motion.div>
 
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight">
@@ -85,10 +85,8 @@ export default function Download() {
               Join Discord for Early Access
             </a>
 
-            {/* Divider */}
             <div className="w-full h-px bg-border/60 mb-10" />
 
-            {/* Notify Me Form */}
             <div className="w-full max-w-md">
               <p className="text-sm font-semibold text-white mb-1">Get pinged when Lithium drops</p>
               <p className="text-xs text-muted-foreground mb-4">Enter your Discord username and we'll notify you the moment it's live.</p>
@@ -172,7 +170,6 @@ export default function Download() {
             ))}
           </div>
         </motion.div>
-
       </div>
     </Layout>
   );
