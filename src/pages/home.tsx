@@ -46,7 +46,7 @@ const features = [
 ];
 
 const stats = [
-  { value: "10,000+", label: "Active Users" },
+  { value: "100+", label: "Active Users" },
   { value: "100+", label: "FPS Gained" },
   { value: "100%", label: "Unbannable" },
 ];
