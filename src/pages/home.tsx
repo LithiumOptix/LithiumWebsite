@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
-import { motion, useInView } from "framer-motion";
-import { Maximize, Cpu, Settings, Wifi, Zap, Key, Star, Target, Shield, Package } from "lucide-react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { 
+  Maximize, Cpu, Settings, Wifi, Zap, Key, 
+  Star, Target, Shield, Package, ChevronRight,
+  Download, Users, Activity
+} from "lucide-react";
 import { Layout } from "@/components/layout";
 
 const DISCORD_INVITE = "https://discord.gg/kVMNkcPkaq";
@@ -86,18 +90,20 @@ const games = [
 
 function FPSCounter() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true });
+  const inView = useInView(ref, { once: true, margin: "-100px" });
   const [count, setCount] = useState(60);
 
   useEffect(() => {
     if (!inView) return;
     let start = 60;
     const end = 180;
-    const duration = 1800;
+    const duration = 2000;
     const startTime = performance.now();
+    
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
+      // Cubic ease out
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(start + (end - start) * eased));
       if (progress < 1) requestAnimationFrame(animate);
@@ -108,39 +114,44 @@ function FPSCounter() {
   return (
     <section className="py-10" ref={ref}>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-3xl border border-border bg-card"
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="relative overflow-hidden rounded-3xl border border-border bg-card/50 backdrop-blur-sm"
       >
-        <div className="grid grid-cols-2 divide-x divide-border">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
           {/* Before */}
-          <div className="flex flex-col items-center justify-center p-10 md:p-14 text-center bg-background/40">
-            <div className="text-xs font-bold tracking-widest text-muted-foreground/60 mb-4 uppercase">Before Lithium</div>
-            <div className="text-7xl md:text-8xl font-black text-muted-foreground/40 tabular-nums">60</div>
-            <div className="text-sm font-bold text-muted-foreground/50 mt-2 tracking-wide">FPS</div>
-            <div className="mt-4 flex gap-1">
+          <div className="flex flex-col items-center justify-center p-12 text-center bg-background/20">
+            <div className="text-xs font-bold tracking-widest text-muted-foreground/60 mb-4 uppercase">Stock Performance</div>
+            <div className="text-7xl md:text-8xl font-black text-muted-foreground/30 tabular-nums">60</div>
+            <div className="text-sm font-bold text-muted-foreground/40 mt-2 tracking-widest">STABLE FPS</div>
+            <div className="mt-6 flex gap-1.5">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="w-2 h-2 rounded-full bg-muted-foreground/20" />
+                <div key={i} className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
               ))}
             </div>
           </div>
 
           {/* After */}
-          <div className="flex flex-col items-center justify-center p-10 md:p-14 text-center relative overflow-hidden">
+          <div className="flex flex-col items-center justify-center p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] bg-primary/20 blur-[80px] rounded-full pointer-events-none" />
+            
             <div className="relative z-10 flex flex-col items-center">
-              <div className="text-xs font-bold tracking-widest text-primary mb-4 uppercase">With Lithium</div>
-              <div className="text-7xl md:text-8xl font-black text-primary glow-text tabular-nums">{count}</div>
-              <div className="text-sm font-bold text-primary/70 mt-2 tracking-wide">FPS</div>
-              <div className="mt-4 flex gap-1">
+              <div className="text-xs font-bold tracking-widest text-primary mb-4 uppercase">Lithium Optimized</div>
+              <div className="text-7xl md:text-8xl font-black text-primary glow-text tabular-nums">
+                {count}
+              </div>
+              <div className="text-sm font-bold text-primary/70 mt-2 tracking-widest">MAXIMIZED FPS</div>
+              <div className="mt-6 flex gap-1.5">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
+                  <motion.div
                     key={i}
-                    className="w-2 h-2 rounded-full bg-primary"
-                    style={{ opacity: inView ? 1 : 0.2, transition: `opacity 0.3s ${i * 0.1}s` }}
+                    initial={{ scale: 0.8, opacity: 0.2 }}
+                    animate={inView ? { scale: 1, opacity: 1 } : {}}
+                    transition={{ delay: i * 0.1, duration: 0.3 }}
+                    className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.6)]"
                   />
                 ))}
               </div>
@@ -148,11 +159,15 @@ function FPSCounter() {
           </div>
         </div>
 
-        {/* Center badge */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-          <div className="bg-card border border-primary/40 text-primary font-black text-sm px-3 py-1.5 rounded-full shadow-lg glow-text whitespace-nowrap">
-            3× FPS
-          </div>
+        {/* Center Badge */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden md:block">
+          <motion.div 
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="bg-background border-2 border-primary/50 text-primary font-black text-sm px-4 py-2 rounded-full shadow-[0_0_20px_rgba(var(--primary),0.3)] whitespace-nowrap"
+          >
+            +200% BOOST
+          </motion.div>
         </div>
       </motion.div>
     </section>
@@ -162,10 +177,10 @@ function FPSCounter() {
 export default function Home() {
   const [memberCount, setMemberCount] = useState<number | null>(null);
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
-
   const [gameThumbnails, setGameThumbnails] = useState<Record<number, string>>({});
 
   useEffect(() => {
+    // Fetch Discord Stats
     fetch("https://discord.com/api/invites/kVMNkcPkaq?with_counts=true")
       .then((r) => r.json())
       .then((data) => {
@@ -173,13 +188,10 @@ export default function Home() {
         setOnlineCount(data.approximate_presence_count);
       })
       .catch(() => {});
-  }, []);
 
-  useEffect(() => {
+    // Fetch Roblox Thumbnails
     const ids = games.map((g) => g.placeId).join(",");
-    fetch(
-      `https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${ids}&size=512x512&format=png&isCircular=false`
-    )
+    fetch(`https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${ids}&size=512x512&format=png&isCircular=false`)
       .then((r) => r.json())
       .then((data) => {
         const map: Record<number, string> = {};
@@ -193,171 +205,107 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-24">
+      <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-24 overflow-x-hidden">
+        
         {/* Hero Section */}
-        <section className="min-h-[80vh] flex flex-col justify-center items-center text-center pt-20">
+        <section className="relative min-h-[90vh] flex flex-col justify-center items-center text-center pt-20">
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full -z-10" />
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex flex-col items-center max-w-4xl"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              The Ultimate Competitive Edge
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mb-8">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              v1.3 LIVE: Hypershot Profiles Added
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-6">
-              Dominate with{" "}
-              <span className="gradient-text">Lithium</span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 leading-[0.9]">
+              DOMINATE WITH <br />
+              <span className="gradient-text italic">LITHIUM</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl leading-relaxed">
-              High-performance Roblox optimization engineered for top competitive players. Stop playing at a disadvantage.
+            <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl leading-relaxed font-medium">
+              The industry-standard optimization suite for competitive Roblox. 
+              Engineered to eliminate latency and unlock your hardware's true potential.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row gap-5 mb-20 w-full sm:w-auto">
               <Link
                 href="/download"
-                className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-bold text-lg glow-button flex items-center justify-center gap-2"
-                data-testid="hero-download-btn"
+                className="bg-primary text-primary-foreground px-10 py-5 rounded-2xl font-black text-lg glow-button flex items-center justify-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                <Zap className="w-5 h-5" />
-                Download Lithium
+                <Download className="w-5 h-5" />
+                GET LITHIUM NOW
               </Link>
               <Link
                 href="/support"
-                className="bg-secondary text-white border border-border px-8 py-4 rounded-full font-bold text-lg hover:bg-secondary/80 transition-colors"
-                data-testid="hero-support-btn"
+                className="bg-secondary/50 backdrop-blur-md text-white border border-border px-10 py-5 rounded-2xl font-bold text-lg hover:bg-secondary transition-colors flex items-center justify-center gap-2"
               >
-                View Features
+                VIEW FEATURES
+                <ChevronRight className="w-5 h-5 opacity-50" />
               </Link>
             </div>
 
             {/* Stats Bar */}
-            <div className="grid grid-cols-3 gap-8 w-full max-w-lg border-t border-border/50 pt-10">
+            <div className="grid grid-cols-3 gap-4 md:gap-12 w-full max-w-2xl border-t border-border/50 pt-12">
               {stats.map((stat, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                  className="text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                  className="flex flex-col items-center"
                 >
-                  <div className="text-3xl md:text-4xl font-bold text-primary glow-text">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+                  <div className="text-3xl md:text-5xl font-black text-white mb-1 tabular-nums">{stat.value}</div>
+                  <div className="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         </section>
 
-        {/* FPS Counter — Before / After */}
+        {/* Comparison Section */}
         <FPSCounter />
 
-        {/* Scrolling Marquee */}
-        <div className="w-full overflow-hidden border-y border-border/40 bg-background/40 py-4 my-8">
-          <div className="marquee-track flex gap-10 w-max whitespace-nowrap">
-            {[
-              "STRETCHED RESOLUTION",
-              "HWID RESET",
-              "PING OPTIMIZER",
-              "FPS BOOSTER",
-              "RIVALS SETTINGS",
-              "WINDOWS TWEAKS",
-              "1-CLICK UNBAN",
-              "PERFORMANCE BOOST",
-              "STRETCHED RESOLUTION",
-              "HWID RESET",
-              "PING OPTIMIZER",
-              "FPS BOOSTER",
-              "RIVALS SETTINGS",
-              "WINDOWS TWEAKS",
-              "1-CLICK UNBAN",
-              "PERFORMANCE BOOST",
-            ].map((item, i) => (
-              <span key={i} className="flex items-center gap-10">
-                <span className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
-                  {item}
-                </span>
-                <span className="text-primary opacity-50 text-lg">✦</span>
-              </span>
+        {/* Marquee */}
+        <div className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] overflow-hidden border-y border-border/40 bg-card/30 py-6 my-16 backdrop-blur-sm">
+          <div className="flex whitespace-nowrap animate-marquee">
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <div key={idx} className="flex gap-12 px-6 items-center">
+                {[
+                  "STRETCHED RESOLUTION", "HWID RESET", "PING OPTIMIZER", 
+                  "FPS BOOSTER", "RIVALS SETTINGS", "WINDOWS TWEAKS", "1-CLICK UNBAN"
+                ].map((text, i) => (
+                  <React.Fragment key={i}>
+                    <span className="text-sm font-black tracking-[0.2em] text-muted-foreground/50 uppercase">{text}</span>
+                    <Zap className="w-4 h-4 text-primary opacity-30" />
+                  </React.Fragment>
+                ))}
+              </div>
             ))}
           </div>
         </div>
 
-        {/* How it Works */}
-        <section className="py-24">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Up and Running in Minutes</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              No complicated setup. Just download, apply, and play.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {/* connector line on desktop */}
-            <div className="hidden md:block absolute top-10 left-[calc(16.66%+1rem)] right-[calc(16.66%+1rem)] h-px border-t border-dashed border-border/60 z-0" />
-
-            {[
-              {
-                step: "01",
-                title: "Download",
-                desc: "Get Lithium in seconds. Lightweight, no bloat, no account needed.",
-                icon: <Zap className="w-6 h-6 text-primary" />,
-              },
-              {
-                step: "02",
-                title: "Apply",
-                desc: "Every optimization takes only 1 click to enable. Stretched res, tweaks, ping — all instantly.",
-                icon: <Settings className="w-6 h-6 text-primary" />,
-              },
-              {
-                step: "03",
-                title: "Dominate",
-                desc: "Feel the difference immediately. Higher FPS, lower ping, sharper input.",
-                icon: <Star className="w-6 h-6 text-primary" />,
-              },
-            ].map((s, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="relative z-10 bg-card border border-border rounded-2xl p-8 text-center glow-card flex flex-col items-center gap-4"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  {s.icon}
-                </div>
-                <div className="text-xs font-bold text-primary/50 tracking-widest">STEP {s.step}</div>
-                <h3 className="text-2xl font-bold text-white">{s.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Features Section */}
+        {/* Features Grid */}
         <section className="py-24" id="features">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Unfair Advantage, Unlocked</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Everything you need to squeeze out every drop of performance from your machine and network.
-            </p>
-          </motion.div>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-6">UNFAIR ADVANTAGE.</h2>
+              <p className="text-muted-foreground text-lg font-medium">
+                Everything you need to squeeze every drop of performance from your machine. 
+                Built by players, for players.
+              </p>
+            </div>
+            <div className="bg-primary/10 border border-primary/20 px-6 py-4 rounded-2xl hidden lg:block">
+              <span className="text-primary font-bold">LATEST BUILD: v1.3.0</span>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
@@ -366,205 +314,135 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="bg-card border border-border rounded-2xl p-8 glow-card shimmer-card flex flex-col items-start text-left group relative overflow-hidden"
-                data-testid={`feature-card-${index}`}
+                transition={{ delay: index * 0.05 }}
+                className="group relative bg-card border border-border rounded-3xl p-8 hover:border-primary/50 transition-all duration-300 overflow-hidden"
               >
-                <div className="shimmer-effect" />
-                <div className="relative z-10 flex flex-col items-start w-full h-full">
-                  <div className="flex items-start justify-between w-full mb-6">
-                    <div className="bg-primary/10 p-4 rounded-xl group-hover:bg-primary/20 transition-colors">
-                      {feature.icon}
-                    </div>
-                    <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full tracking-wide">
-                      {feature.tag}
-                    </span>
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  {React.cloneElement(feature.icon as React.ReactElement, { className: "w-24 h-24" })}
+                </div>
+                
+                <div className="relative z-10">
+                  <div className="mb-6 inline-block bg-primary/10 p-3 rounded-2xl">
+                    {feature.icon}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed flex-1">{feature.description}</p>
+                  <div className="text-[10px] font-black text-primary tracking-widest uppercase mb-2">{feature.tag}</div>
+                  <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed font-medium">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* Supported Games */}
-        <section className="py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Optimized for Top Roblox Games</h2>
-            <p className="text-muted-foreground text-lg">Pre-built performance profiles for the most competitive titles.</p>
-          </motion.div>
+        {/* Games Support */}
+        <section className="py-20 border-t border-border/50">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">ENGINEERED FOR THE BEST.</h2>
+            <p className="text-muted-foreground font-medium">Custom optimization profiles for Roblox's most demanding titles.</p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {games.map((game, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`bg-card border ${game.border} rounded-2xl overflow-hidden glow-card flex flex-col`}
-                data-testid={`game-card-${i}`}
+                whileHover={{ y: -8 }}
+                className={`group bg-card border ${game.border} rounded-3xl overflow-hidden transition-all`}
               >
-                {/* Thumbnail */}
-                <div className="relative h-44 overflow-hidden flex-shrink-0">
+                <div className="relative h-56 overflow-hidden">
                   {gameThumbnails[game.placeId] ? (
-                    <img
-                      src={gameThumbnails[game.placeId]}
-                      alt={game.name}
-                      className="w-full h-full object-cover"
+                    <img 
+                      src={gameThumbnails[game.placeId]} 
+                      alt={game.name} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   ) : (
-                    <div className={`w-full h-full bg-gradient-to-br ${game.fallbackGradient} flex items-center justify-center`}>
-                      <div className={game.color}>{game.icon}</div>
-                    </div>
+                    <div className={`w-full h-full bg-gradient-to-br ${game.fallbackGradient} flex items-center justify-center`} />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                  <span className={`absolute top-3 left-3 text-xs font-bold border px-2.5 py-1 rounded-full bg-background/70 backdrop-blur-sm ${game.color} border-current/30`}>
-                    {game.tag}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="p-6 flex flex-col gap-2">
-                  <h3 className="text-lg font-bold text-white">{game.name}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{game.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Changelog */}
-        <section className="py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10"
-          >
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Latest Updates</h2>
-              <p className="text-muted-foreground">Lithium is actively developed and regularly improved.</p>
-            </div>
-            <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full self-start sm:self-auto whitespace-nowrap">
-              Current: v1.3
-            </span>
-          </motion.div>
-
-          <div className="flex flex-col gap-4">
-            {[
-              { version: "v1.3", date: "Latest", label: "NEW", labelColor: "text-green-400 bg-green-500/10 border-green-500/20", desc: "Added Hypershot optimization profile and improved FPS unlock stability." },
-              { version: "v1.2", date: "Recent", label: "UPDATE", labelColor: "text-primary bg-primary/10 border-primary/20", desc: "HWID Reset & bypass tools released. 1-click hardware identifier spoofing." },
-              { version: "v1.1", date: "Earlier", label: "UPDATE", labelColor: "text-primary bg-primary/10 border-primary/20", desc: "Ping optimizer upgraded with TCP/IP stack improvements. Avg -40ms reduction." },
-              { version: "v1.0", date: "Launch", label: "RELEASE", labelColor: "text-muted-foreground bg-muted/40 border-border", desc: "Initial launch with 6 core optimization modules: stretched res, Windows tweaks, rivals settings, performance boost, ping opt." },
-            ].map((entry, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="flex items-start gap-5 bg-card border border-border rounded-2xl p-5 glow-card group"
-                data-testid={`changelog-entry-${i}`}
-              >
-                <div className="flex flex-col items-center gap-2 flex-shrink-0 pt-0.5">
-                  <span className="font-mono font-bold text-white text-sm">{entry.version}</span>
-                  <div className="w-px flex-1 bg-border/60 min-h-[16px]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className={`text-xs font-bold border px-2 py-0.5 rounded-full ${entry.labelColor}`}>
-                      {entry.label}
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <span className={`text-[10px] font-black border px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm ${game.color} border-current/30 tracking-widest uppercase`}>
+                      {game.tag}
                     </span>
-                    <span className="text-xs text-muted-foreground">{entry.date}</span>
                   </div>
-                  <p className="text-sm text-foreground/80 leading-relaxed">{entry.desc}</p>
+                </div>
+                <div className="p-8">
+                  <h3 className="text-2xl font-black text-white mb-3">{game.name}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">{game.desc}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* Discord Community Banner */}
+        {/* Discord Banner */}
         <section className="py-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="relative overflow-hidden rounded-3xl border border-[#5865F2]/30 bg-gradient-to-br from-[#5865F2]/10 via-card to-primary/5 p-10 md:p-14 text-center"
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="relative overflow-hidden rounded-[2.5rem] border border-[#5865F2]/40 bg-[#5865F2]/5 p-12 md:p-20 text-center"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#5865F2]/5 via-transparent to-primary/5 pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#5865F2]/50 to-transparent" />
-            <div className="relative z-10 flex flex-col items-center gap-5">
-              <div className="flex items-center gap-2 text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-1.5 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                {onlineCount != null
-                  ? `${onlineCount.toLocaleString()} members online now`
-                  : "Community Active"}
+            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+            
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="flex items-center gap-3 text-xs font-black bg-green-500/10 border border-green-500/20 text-green-400 px-5 py-2 rounded-full mb-8 tracking-[0.2em] uppercase">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_#4ade80]" />
+                {onlineCount ? `${onlineCount.toLocaleString()} MEMBERS ACTIVE` : "COMMUNITY ONLINE"}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white">
-                Join the Lithium Community
-              </h2>
-              <p className="text-muted-foreground max-w-lg text-lg">
-                {memberCount != null
-                  ? `${memberCount.toLocaleString()} members and growing. Get early access, share clips, and connect with the best Roblox players.`
-                  : "Join thousands of elite players. Get early access, share clips, and connect with the best."}
+              
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">JOIN THE INNER CIRCLE.</h2>
+              <p className="text-muted-foreground max-w-2xl text-lg font-medium mb-12">
+                Join {memberCount?.toLocaleString() ?? "10,000+"} elite players. Get early beta access to Lithium v2, 
+                share your clips, and dominate the leaderboard.
               </p>
+
               <a
                 href={DISCORD_INVITE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-3 bg-[#5865F2] text-white px-8 py-3.5 rounded-full font-bold text-base hover:bg-[#4752C4] transition-colors shadow-lg"
-                data-testid="discord-banner-btn"
+                className="group flex items-center gap-4 bg-[#5865F2] hover:bg-[#4752C4] text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-[0_20px_40px_rgba(88,101,242,0.3)]"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" />
-                </svg>
-                Join Discord
-                {memberCount != null && (
-                  <span className="bg-white/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
-                    {memberCount.toLocaleString()} members
-                  </span>
-                )}
+                <Users className="w-6 h-6" />
+                JOIN DISCORD COMMUNITY
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
           </motion.div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="bg-primary/5 border border-primary/20 rounded-3xl p-12 text-center relative overflow-hidden"
-          >
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
-            <h2 className="text-4xl font-bold text-white mb-6">Ready to stop losing?</h2>
-            <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-              Join the ranks of elite players using Lithium to dominate their lobbies. The competition is already using it.
+        {/* Final CTA */}
+        <section className="py-24">
+          <div className="bg-gradient-to-b from-primary/10 to-transparent border border-primary/20 rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden">
+            <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter">STOP LOSING.</h2>
+            <p className="text-muted-foreground text-xl mb-12 max-w-2xl mx-auto font-medium">
+              Your hardware is capable of more. Unlock it today with Lithium.
             </p>
             <Link
               href="/download"
-              className="inline-flex bg-primary text-primary-foreground px-8 py-4 rounded-full font-bold text-lg glow-button items-center justify-center gap-2"
-              data-testid="bottom-download-btn"
+              className="inline-flex bg-white text-black px-12 py-6 rounded-2xl font-black text-xl hover:bg-primary hover:text-white transition-all duration-300"
             >
-              Get Started Now
+              DOWNLOAD FOR WINDOWS
             </Link>
-          </motion.div>
+          </div>
         </section>
+
       </div>
+
+      <style jsx global>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .glow-text {
+          text-shadow: 0 0 20px rgba(var(--primary-rgb), 0.5);
+        }
+        .gradient-text {
+          background: linear-gradient(to right, #fff, #ff3e3e);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      `}</style>
     </Layout>
   );
 }
